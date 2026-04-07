@@ -109,6 +109,87 @@ function persistStatusLocalOnly() {
     saveStatusToStorage();
 }
 
+function isSupabaseConfigured(cfg) {
+    return !!(
+        cfg &&
+        String(cfg.url || "").trim() &&
+        String(cfg.anonKey || "").trim()
+    );
+}
+
+function createSupabaseSync(cfg) {
+    const createClient = window.supabase && window.supabase.createClient;
+    if (!createClient) {
+        return null;
+    }
+    const client = createClient(String(cfg.url).trim(), String(cfg.anonKey).trim());
+    const table = String(cfg.table || "checkpoints").trim() || "checkpoints";
+
+    return {
+        client,
+        table,
+
+        async fetchRows() {
+            const { data, error } = await client
+                .from(table)
+                .select("*")
+                .order("id", { ascending: true });
+            if (error) {
+                throw error;
+            }
+            return data || [];
+        },
+
+        async upsertRow(row) {
+            const payload = {
+                id: row.id,
+                name: row.name,
+                status: row.status,
+                pos_x: row.x,
+                pos_y: row.y,
+                updated_at: new Date().toISOString(),
+            };
+            const { error } = await client.from(table).upsert(payload, { onConflict: "id" });
+            if (error) {
+                throw error;
+            }
+        },
+
+        async updateRow(id, patch) {
+            const dbPatch = { updated_at: new Date().toISOString() };
+            if ("name" in patch) {
+                dbPatch.name = patch.name;
+            }
+            if ("status" in patch) {
+                dbPatch.status = patch.status;
+            }
+            if ("x" in patch) {
+                dbPatch.pos_x = patch.x;
+            }
+            if ("y" in patch) {
+                dbPatch.pos_y = patch.y;
+            }
+            const { error } = await client.from(table).update(dbPatch).eq("id", id);
+            if (error) {
+                throw error;
+            }
+        },
+
+        subscribe(onPayload) {
+            return client
+                .channel("checkpoints-app-" + Math.random().toString(36).slice(2))
+                .on(
+                    "postgres_changes",
+                    { event: "*", schema: "public", table },
+                    (payload) => {
+                        onPayload(payload);
+                    }
+                )
+                .subscribe();
+        },
+    };
+}
+
 function applyRowsFromDb(rows) {
     checkpointPlacements.length = 0;
     Object.keys(checkpointNames).forEach((k) => {
@@ -323,9 +404,8 @@ async function init() {
     setSyncStatus("Memuat…");
 
     try {
-        const SU = window.CheckUtilitySupabase;
-        if (SU && SU.isConfigured(appConfig.supabase)) {
-            sbSync = SU.createSync(appConfig.supabase);
+        if (isSupabaseConfigured(appConfig.supabase)) {
+            sbSync = createSupabaseSync(appConfig.supabase);
             if (!sbSync) {
                 throw new Error("Library Supabase tidak termuat (createClient).");
             }
