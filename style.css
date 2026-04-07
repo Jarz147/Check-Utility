@@ -16,10 +16,23 @@ body {
 .app-container {
     display: flex;
     height: 100vh;
+    min-height: 0;
+}
+
+.sync-status {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.55);
+    margin: 0 0 12px;
+    line-height: 1.4;
+}
+
+.sync-status--error {
+    color: #fca5a5;
 }
 
 .sidebar {
-    width: 300px;
+    flex-shrink: 0;
+    width: 320px;
     background: var(--card-bg);
     backdrop-filter: blur(10px);
     border-right: 1px solid rgba(255,255,255,0.1);
@@ -28,7 +41,9 @@ body {
 }
 
 .map-wrapper {
-    flex-grow: 1;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -36,15 +51,37 @@ body {
     position: relative;
 }
 
+/* Area penuh untuk memusatkan gambar */
 .map-container {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 12px;
+}
+
+/* Kotak = ukuran gambar setelah scale — titik checkpoint pakai koordinat relatif ke sini */
+.map-surface {
     position: relative;
     display: inline-block;
+    max-width: 100%;
+    max-height: 100%;
+    line-height: 0;
+    vertical-align: middle;
 }
 
 #layout-img {
-    max-height: 90vh;
-    max-width: 100%;
     display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    /* Pastikan muat di jendela (padding map-container ~24px); 100% sering gagal jika tinggi induk auto */
+    max-height: calc(100vh - 48px);
+    max-height: calc(100dvh - 48px);
+    object-fit: contain;
 }
 
 /* Style untuk Titik di Map */
@@ -81,12 +118,70 @@ body {
 /* List Item di Sidebar */
 .status-item {
     padding: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     border-radius: 8px;
     background: rgba(255,255,255,0.05);
     display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.status-item-head {
+    display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.status-item-qr {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.status-item-qr img,
+.status-item-qr canvas {
+    display: block;
+    border-radius: 4px;
+    background: #fff;
+    padding: 4px;
+    flex-shrink: 0;
+}
+
+.status-qr-hint {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.55);
+    line-height: 1.35;
+    flex: 1;
+    min-width: 120px;
+}
+
+a.status-qr-fallback {
+    font-size: 12px;
+    color: #86efac;
+}
+
+.scan-feedback {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 14px 20px;
+    text-align: center;
+    font-size: 15px;
+    background: rgba(34, 197, 94, 0.95);
+    color: #0f172a;
+    font-weight: 600;
+    transform: translateY(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.scan-feedback.visible {
+    transform: translateY(0);
 }
 
 .checkpoint-name-editable {
