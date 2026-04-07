@@ -1,0 +1,90 @@
+:root {
+    --bg-dark: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --green: #22c55e;
+    --red: #ef4444;
+}
+
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background-color: var(--bg-dark);
+    color: white;
+    overflow: hidden;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 300px;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255,255,255,0.1);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.map-wrapper {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    position: relative;
+}
+
+.map-container {
+    position: relative;
+    display: inline-block;
+}
+
+#layout-img {
+    max-height: 90vh;
+    max-width: 100%;
+    display: block;
+}
+
+/* Style untuk Titik di Map */
+.dot {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid white;
+    cursor: move;
+    transform: translate(-50%, -50%); /* Agar titik tepat di ujung kursor */
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    z-index: 10;
+}
+
+/* Label nama area di atas titik */
+.dot::after {
+    content: attr(data-name);
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: black;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+/* Warna Status */
+.checked { background-color: var(--green); box-shadow: 0 0 15px var(--green); }
+.unchecked { background-color: var(--red); box-shadow: 0 0 15px var(--red); }
+
+/* List Item di Sidebar */
+.status-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
