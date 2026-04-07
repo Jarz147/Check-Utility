@@ -88,3 +88,27 @@ body {
     justify-content: space-between;
     align-items: center;
 }
+
+.checkpoint-name-editable {
+    cursor: pointer;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.25);
+}
+
+.checkpoint-actions {
+    margin-bottom: 16px;
+}
+
+.btn-add-checkpoint {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(34, 197, 94, 0.2);
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-add-checkpoint:hover {
+    background: rgba(34, 197, 94, 0.35);
+}
